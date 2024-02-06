@@ -2,6 +2,29 @@
 
 ## 源码来自于网上教程，还有许多不太清楚的地方
 
+## 简单食用例子
+```shell
+cd Timer
+mkdir build
+cd build
+cmake ..
+make
+../bin/app
+```
+
+### 输出
+```
+1000ms -->i:1 || node.expire -->20858677 || node.id -->1
+1500ms -->i:2 || node.expire -->20859178 || node.id -->2
+2000ms -->i:2 || node.expire -->20859677 || node.id -->0
+1500ms -->i:3 || node.expire -->20860179 || node.id -->3
+1500ms -->i:4 || node.expire -->20861181 || node.id -->4
+1500ms -->i:5 || node.expire -->20862182 || node.id -->5
+1500ms -->i:6 || node.expire -->20863184 || node.id -->6
+1500ms -->i:7 || node.expire -->20864186 || node.id -->7
+1500ms -->i:8 || node.expire -->20865187 || node.id -->8
+1500ms -->i:9 || node.expire -->20866189 || node.id -->9
+```
 ## 1.通过cmake编译(VERSION 3.15)
 ```cmake
 cmake_minimum_required(VERSION 3.15)                    #cmake版本
