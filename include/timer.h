@@ -1,43 +1,60 @@
-#include <time.h>
-#include <sys/epoll.h>
-#include <sys/timerfd.h>
-#include <unistd.h>
+﻿#ifndef TIMER_H
+#define TIMER_H
 
-#include <chrono>
-#include <set>
-#include <memory>
-#include <iostream>
-#include <functional>
+#include<iostream>
+#include<set>
+#include<functional>
+#include<thread>
+#include<atomic>
+#include<chrono>
+#include<mutex>
+#include<condition_variable>
 
-// 节点基类
+/*Debug*/
+//#define _DEBUG_
+
+/*Timer Task Bass Class*/
 struct TimerNodeBass
 {
-    time_t expire; // 执行时间
-    uint64_t id;   // 唯一id
+	uint64_t id;
+	time_t expire;
 };
 
-// 节点
-struct TimerNode : TimerNodeBass
+/*Timer Task Bass Class*/
+struct TimerNode : public TimerNodeBass
 {
-    // 执行函数
-    using Callback = std::function<void(const TimerNode &node)>;
-    TimerNode::Callback func;
-    TimerNode(time_t expire, uint64_t id, TimerNode::Callback func);
+	using Callback = std::function<void(const TimerNode& node)>;
+	Callback func;
+	TimerNode(uint64_t id, time_t expire, TimerNode::Callback func);
 };
 
-// 重载小于
-bool operator<(const TimerNodeBass &ln, const TimerNodeBass &rn);
+/*Overload less than*/
+bool operator<(const TimerNodeBass& ln, const TimerNodeBass rn);
 
+/*Timer Class*/
 class Timer
 {
 private:
-    static uint64_t gid;                       // id
-    static inline uint64_t GenID();            // 获取id
-    std::set<TimerNode, std::less<>> timeouts; // 存储Node
+	std::thread m_worker;
+	std::set<TimerNode, std::less<>> m_task;
+	std::atomic<bool> m_stop;
+	std::mutex m_task_mutex;
+	std::condition_variable m_condition;
+	static uint64_t gid;
+	static inline uint64_t GenID();
+	void run();
 public:
-    static inline time_t GetTick();                             // 获取毫秒
-    TimerNodeBass AddTimer(int time, TimerNode::Callback func); // 添加任务
-    bool DelTimer(TimerNodeBass &node);                         // 删除任务
-    bool CheckTimer();                                          // 更新计时器
-    time_t TimeToSleep();                                       // 返回最近任务触发时间
+	Timer();
+	~Timer();
+	/*Return Tick*/
+	static inline time_t GetTick();
+	TimerNodeBass AddTimer(int time,TimerNode::Callback func);
+	bool DelTimer(TimerNodeBass& node);
+	/*Return Recent Task Time*/
+	time_t TimeToSellp();
 };
+
+#endif
+
+
+
